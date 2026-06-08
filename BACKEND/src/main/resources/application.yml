@@ -1,0 +1,103 @@
+# =============================================================
+#  CONFIGURACIÓN BASE — LiteThinking Backend
+#  Se aplica en todos los perfiles. Los valores por defecto
+#  permiten arranque local inmediato sin configuración manual,
+#  pero son sobreescribibles vía variables de entorno.
+# =============================================================
+
+spring:
+  application:
+    name: litethinking-backend
+
+  # ── Base de Datos / Datasource ──────────────────────────────
+  datasource:
+    # Interpolación de variables de entorno con fallback para desarrollo local
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/litethinking_db?currentSchema=litethinking}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:admin}
+    driver-class-name: org.postgresql.Driver
+
+  # ── JPA / Hibernate ─────────────────────────────────────────
+  jpa:
+    open-in-view: false          # Deshabilitado para evitar anti-pattern OSIV
+    show-sql: ${SHOW_SQL:false}
+    hibernate:
+      # Hibernate NO crea la base de datos, solo valida que el esquema 
+      # generado por Flyway coincida con las entidades de dominio mapeadas
+      ddl-auto: ${DDL_AUTO:validate}
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          batch_size: 25
+        order_inserts: true
+        order_updates: true
+        default_schema: litethinking
+
+  # ── Flyway ──────────────────────────────────────────────────
+  flyway:
+    enabled: true
+    schemas: litethinking
+    # Ruta donde Spring Boot buscará los scripts V1, V2, etc.
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    validate-on-migrate: true
+
+  # ── Jackson ─────────────────────────────────────────────────
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+    deserialization:
+      fail-on-unknown-properties: false
+    time-zone: America/Bogota
+
+  # ── Mail (Requerido para instanciar JavaMailSender) ─────────
+  mail:
+    host: ${MAIL_HOST:localhost}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:test}
+    password: ${MAIL_PASSWORD:test}
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+
+# ── Servidor ──────────────────────────────────────────────────
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /api
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# ── Actuator ──────────────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, metrics
+  endpoint:
+    health:
+      show-details: when-authorized
+
+# ── Springdoc / Swagger UI ────────────────────────────────────
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operations-sorter: alpha
+    tags-sorter: alpha
+
+# ── Propiedades de la Aplicación (JWT y CORS) ─────────────────
+application:
+  jwt:
+    # La clave secreta DEBE ser sobreescrita en producción a través de la variable JWT_SECRET.
+    # El fallback permite desarrollo local inmediato (debe ser larga y segura para HMAC-SHA256).
+    secret: ${JWT_SECRET:una_clave_secreta_muy_larga_y_segura_de_al_menos_256_bits_para_local}
+    # Expiración: Por defecto 24 horas (86400000 ms)
+    expiration-ms: ${JWT_EXPIRATION:86400000}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:9000,http://localhost:3000}

@@ -1,0 +1,19 @@
+# General
+.idea/
+.vscode/
+scratch/
+*.log
+
+# Backend (Maven/Spring Boot)
+BACKEND/target/
+BACKEND/.mvn/wrapper/maven-wrapper.jar
+!BACKEND/.mvn/wrapper/maven-wrapper.properties
+BACKEND/*mvnw*
+
+# Frontend (Node/Quasar/Vue)
+FRONTEND/node_modules/
+FRONTEND/dist/
+FRONTEND/.quasar/
+FRONTEND/package-lock.json
+FRONTEND/.env
+FRONTEND/.env.*
