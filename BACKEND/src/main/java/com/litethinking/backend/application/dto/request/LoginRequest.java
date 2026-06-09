@@ -3,12 +3,14 @@ package com.litethinking.backend.application.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
+import lombok.Setter;
 import lombok.NoArgsConstructor;
 
 /**
  * DTO de entrada para el caso de uso de autenticación (login).
  */
 @Getter
+@Setter
 @NoArgsConstructor
 public class LoginRequest {
 
